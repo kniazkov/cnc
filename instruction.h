@@ -6,12 +6,12 @@ namespace cnc {
 
 	struct int_value {
 		bool has_value;
-		int value;
+		long value;
 	};
 
 	struct real_value {
 		bool has_value;
-		float value;
+		double value;
 	};
 
 	struct instruction {

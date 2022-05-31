@@ -46,7 +46,7 @@ namespace cnc {
 				throw std::stringstream() << "Missed parameter: '" << std::toupper(ch) << "...'";
 			}
 
-			int neg = 1;
+			long neg = 1;
 			ch = line[index];
 			if (ch == '-') {
 				neg = -1;
@@ -58,12 +58,29 @@ namespace cnc {
 			}
 
 			bool has_number = false;
-			int int_part = 0;
+			long int_part = 0;
 			while (ch >= '0' && ch <= '9') {
 				has_number = true;
 				int_part = int_part * 10 + ch - '0';
 				index++;
 				ch = index < len ? line[index] : 0;
+			}
+
+			double divisor = 1;
+			double real_part = 0;
+			if (ch == '.') {
+				if (!real_ptr) {
+					throw std::stringstream() << "Expected an integer number: '" << std::toupper(ch) << "...'";
+				}
+				index++;
+				ch = index < len ? line[index] : 0;
+				while (ch >= '0' && ch <= '9') {
+					has_number = true;
+					real_part = real_part * 10 + ch - '0';
+					divisor *= 10;
+					index++;
+					ch = index < len ? line[index] : 0;
+				}
 			}
 
 			if (!has_number) {
@@ -76,7 +93,7 @@ namespace cnc {
 			}
 			else if (real_ptr) {
 				real_ptr->has_value = true;
-				real_ptr->value = int_part * neg;
+				real_ptr->value = ((double)int_part + real_part / divisor) * neg;
 			}
 
 			index++;
