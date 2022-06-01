@@ -2,6 +2,7 @@
 #include <iostream>
 #include "unit_tests.h"
 #include "parser.h"
+#include "interpolator.h"
 
 namespace cnc {
 
@@ -67,6 +68,18 @@ namespace cnc {
 		return code == actual.str();
 	}
 
+	static bool test_linear_stepper() {
+		point begin = { 0 },
+			end;
+		linear_stepper stepper(begin, 2, 0, 0, 5);
+		int count = 0;
+		while (stepper.has_next()) {
+			end = stepper.next();
+			count++;
+		}
+		return count == 10 && end.X == 2 && end.Y == 0 && end.Z == 0 && end.percent == 1;
+	}
+
 	typedef bool (*test_case)();
 
 	test_case tests[] = {
@@ -77,7 +90,8 @@ namespace cnc {
 		test_parsing_real_numbers_without_real_part,
 		test_parsing_real_numbers_without_int_part,
 		test_parsing_line_with_extra_spaces,
-		test_parsing_code
+		test_parsing_code,
+		test_linear_stepper
 	};
 
 	void test_all() {
