@@ -1,15 +1,17 @@
 #include <sstream>
+#include <iostream>
 #include "parser.h"
 
 namespace cnc {
 
-	static void parse_line_ex(std::string &line, parsing_result *result) {
+	static instruction parse_line_ex(std::string &line, parsing_result *result) {
+		instruction instr = {0};
 		size_t len = line.length();
 		size_t index = 0;
 
 		while (index < len) {
 			char ch = line[index];
-			while ((ch == ' ' || ch == '\t') && index < len) {
+			while ((ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n') && index < len) {
 				index++;
 				ch = line[index];
 			}
@@ -19,19 +21,19 @@ namespace cnc {
 			switch (ch) {
 			case 'G':
 			case 'g':
-				int_ptr = &result->instr.G;
+				int_ptr = &instr.G;
 				break;
 			case 'X':
 			case 'x':
-				real_ptr = &result->instr.X;
+				real_ptr = &instr.X;
 				break;
 			case 'Y':
 			case 'y':
-				real_ptr = &result->instr.Y;
+				real_ptr = &instr.Y;
 				break;
 			case 'Z':
 			case 'z':
-				real_ptr = &result->instr.Z;
+				real_ptr = &instr.Z;
 				break;
 			default:
 				throw std::stringstream() << "Unknown symbol: '" << ch << '\'';
@@ -98,15 +100,46 @@ namespace cnc {
 
 			index++;
 		}
+
+		return instr;
 	}
 
-	void parse_line(std::string &line, parsing_result* result) {
+	instruction parse_line(std::string &line, parsing_result* result) {
+		instruction instr;
 		try {
-			parse_line_ex(line, result);
+			instr = parse_line_ex(line, result);
 		}
 		catch (std::stringstream &error) {
 			result->error = true;
 			result->message = error.str();
 		}
+		return instr;
+	}
+
+	std::vector<instruction> parse_code(std::string& code, parsing_result* result) {
+		std::vector<std::string> lines;
+		std::stringstream stream;
+		for (char ch : code) {
+			if (ch == '\n') {
+				lines.push_back(stream.str());
+				stream = std::stringstream();
+			}
+			else {
+				stream << ch;
+			}
+		}
+		lines.push_back(stream.str());
+		std::vector<instruction> parsed_code;
+		for (int index = 0; index < lines.size(); index++) {
+			instruction instr = parse_line(lines[index], result);
+			if (result->error) {
+				result->line_number = index + 1;
+				break;
+			}
+			if (instr.is_not_empty()) {
+				parsed_code.push_back(instr);
+			}
+		}
+		return parsed_code;
 	}
 }

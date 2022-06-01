@@ -18,6 +18,7 @@ namespace cnc {
 		int_value G;
 		real_value X, Y, Z;
 
+		bool is_not_empty();
 		std::string to_string();
 	};
 }

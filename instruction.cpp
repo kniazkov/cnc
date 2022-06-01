@@ -2,6 +2,10 @@
 
 namespace cnc {
 
+	bool instruction::is_not_empty() {
+		return G.has_value || X.has_value || Y.has_value || Z.has_value;
+	}
+
 	std::string instruction::to_string() {
 		std::stringstream stream;
 		bool flag = false;
