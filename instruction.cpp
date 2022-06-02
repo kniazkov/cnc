@@ -55,12 +55,12 @@ namespace cnc {
 
 	std::shared_ptr<stepper> instruction::create_stepper(point& begin, double points_per_millimeter) {
 		if (G.has_value) {
-			switch (G.value)
-			{
+			switch (G.value) {
 			case 0:
 			case 1:
 				return std::make_shared<linear_stepper>(begin, X.value, Y.value, Z.value, points_per_millimeter);
 			default:
+				break;
 			}
 		}
 		return std::make_shared<stepper_does_nothing>(begin);
