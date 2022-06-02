@@ -1,4 +1,5 @@
 #include "instruction.h"
+#include "interpolator.h"
 
 namespace cnc {
 
@@ -40,5 +41,28 @@ namespace cnc {
 			flag = true;
 		}
 		return stream.str();
+	}
+
+	class stepper_does_nothing : public stub_stepper {
+	protected:
+		void payload(point& point) {
+			// do nothing
+		}
+	public:
+		stepper_does_nothing(point& begin) : stub_stepper(begin) {
+		}
+	};
+
+	std::shared_ptr<stepper> instruction::create_stepper(point& begin, double points_per_millimeter) {
+		if (G.has_value) {
+			switch (G.value)
+			{
+			case 0:
+			case 1:
+				return std::make_shared<linear_stepper>(begin, X.value, Y.value, Z.value, points_per_millimeter);
+			default:
+			}
+		}
+		return std::make_shared<stepper_does_nothing>(begin);
 	}
 }

@@ -10,6 +10,17 @@ namespace cnc {
 		virtual point next() = 0;
 	};
 
+	class stub_stepper : public stepper {
+		point p;
+		bool used;
+	protected:
+		virtual void payload(point& point) = 0;
+	public:
+		stub_stepper(point& begin);
+		bool has_next() override;
+		point next() override;
+	};
+
 	class linear_stepper : public stepper {
 		double tX,
 			tY,

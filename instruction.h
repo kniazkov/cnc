@@ -1,6 +1,9 @@
 #pragma once
 
 #include <sstream>
+#include <memory>
+#include "point.h"
+#include "interpolator.h"
 
 namespace cnc {
 
@@ -20,5 +23,6 @@ namespace cnc {
 
 		bool is_not_empty();
 		std::string to_string();
+		std::shared_ptr<stepper> create_stepper(point &begin, double points_per_millimeter);
 	};
 }

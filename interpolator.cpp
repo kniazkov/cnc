@@ -2,6 +2,23 @@
 #include "interpolator.h"
 
 namespace cnc {
+	stub_stepper::stub_stepper(point& begin) {
+		p = begin;
+		used = false;
+	}
+
+	bool stub_stepper::has_next() {
+		return !used;
+	}
+
+	point stub_stepper::next() {
+		if (!used) {
+			used = true;
+			payload(p);
+		}
+		return p;
+	}
+		
 	linear_stepper::linear_stepper(point& begin, double X, double Y, double Z, double points_per_millimeters) {
 		p = begin;
 		tX = X;

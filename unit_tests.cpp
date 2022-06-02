@@ -80,6 +80,24 @@ namespace cnc {
 		return count == 10 && end.X == 2 && end.Y == 0 && end.Z == 0 && end.percent == 1;
 	}
 
+	static bool test_creating_stepper_from_instruction() {
+		point begin = { 0 },
+			end;
+		instruction i = { 0 };
+		i.G.has_value = true;
+		i.G.value = 1;
+		i.X.has_value = true;
+		i.X.value = 2.0;
+		std::shared_ptr<stepper> stepper = i.create_stepper(begin, 5);
+		int count = 0;
+		while (stepper->has_next()) {
+			end = stepper->next();
+			count++;
+		}
+		return count == 10 && end.X == 2 && end.Y == 0 && end.Z == 0 && end.percent == 1;
+	}
+
+
 	typedef bool (*test_case)();
 
 	test_case tests[] = {
@@ -91,7 +109,8 @@ namespace cnc {
 		test_parsing_real_numbers_without_int_part,
 		test_parsing_line_with_extra_spaces,
 		test_parsing_code,
-		test_linear_stepper
+		test_linear_stepper,
+		test_creating_stepper_from_instruction
 	};
 
 	void test_all() {
